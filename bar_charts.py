@@ -51,6 +51,7 @@ def process_barcharts(file_paths: list[str]) -> tuple[pd.DataFrame, pd.DataFrame
         df["Species"] = df["Species"].str.replace('</em>)', "")
         df[["Com_Name", "Sci_Name"]] = pd.DataFrame(df["Species"].str.split(',').to_list())
         df["Com_Name"] = df["Com_Name"].str.strip()
+        df["Tax_Order"] = df.index # keep original order
 
         # append to lists
         freq_list.append(df)
@@ -58,6 +59,10 @@ def process_barcharts(file_paths: list[str]) -> tuple[pd.DataFrame, pd.DataFrame
     # compile into DataFrames
     freqs = pd.concat(freq_list)
     samples = pd.DataFrame(sample_size)
+
+    # quasi-taxonomical ordering:
+    # sort by original order in bar chart file
+    freqs = freqs.sort_values(by="Tax_Order")
 
     return freqs, samples
 
@@ -74,6 +79,11 @@ def create_target_pivot(freqs: pd.DataFrame, month: int, week: int) -> pd.DataFr
 
     # pivot table
     data = freqs[["Region", "Com_Name", "Sci_Name", col]]
-    pivot = data.pivot(index=["Com_Name", "Sci_Name"], columns="Region", values=col).reset_index()
+    pivot = data.pivot_table(
+        index=["Com_Name", "Sci_Name"],
+        columns="Region",
+        values=col,
+        sort=False
+    )
 
     return pivot
