@@ -4,6 +4,7 @@ Functions for processing eBird bar charts and creating pivot tables by region
 
 from io import StringIO
 import pandas as pd
+import numpy as np
 
 def process_barcharts(file_paths: list[str]) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
@@ -77,13 +78,22 @@ def create_target_pivot(freqs: pd.DataFrame, month: int, week: int) -> pd.DataFr
     # target column name
     col = f"{month}_{week}"
 
+    data = freqs[["Region", "Com_Name", "Sci_Name", col]].copy()
+
+    # report as percentages
+    data[col] = data[col].fillna(0)
+    data[col] = np.round(data[col]*100, 2)
+
     # pivot table
-    data = freqs[["Region", "Com_Name", "Sci_Name", col]]
     pivot = data.pivot_table(
         index=["Com_Name", "Sci_Name"],
         columns="Region",
         values=col,
         sort=False
     )
+
+    # only keep species with at least 1% frequency
+    # in at least one region (i.e. drop random vagrants)
+    pivot = pivot.loc[(pivot > 1).any(axis=1)]
 
     return pivot
