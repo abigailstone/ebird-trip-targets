@@ -5,6 +5,28 @@ Functions for processing eBird bar charts and creating pivot tables by region
 from io import StringIO
 import pandas as pd
 import numpy as np
+from ebird.api.requests import get_taxonomy
+
+def join_taxonomy(pivot: pd.DataFrame, api_key: str) -> pd.DataFrame:
+    """
+    :param pivot: DataFrame of frequencies by region and species
+    :param api_key: eBird API key
+    :return: DataFrame with taxonomy ordering from eBird API
+    """
+    # fetch taxonomy from eBird API
+    tax_response = get_taxonomy(api_key)
+    taxonomy = pd.json_normalize(tax_response)
+
+    # join relevant columns to frequency outpt
+    tax = taxonomy[["sciName", "category", "taxonOrder"]].set_index("sciName")
+    joined = pivot.set_index("Sci_Name").join(tax).reset_index()
+
+    # sort by taxonomic order
+    joined = joined.sort_values("taxonOrder")
+
+    joined = joined.drop(columns=["category", "taxonOrder"])
+
+    return joined
 
 def process_barcharts(file_paths: list[str]) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
@@ -52,7 +74,6 @@ def process_barcharts(file_paths: list[str]) -> tuple[pd.DataFrame, pd.DataFrame
         df["Species"] = df["Species"].str.replace('</em>)', "")
         df[["Com_Name", "Sci_Name"]] = pd.DataFrame(df["Species"].str.split(',').to_list())
         df["Com_Name"] = df["Com_Name"].str.strip()
-        df["Tax_Order"] = df.index # keep original order
 
         # append to lists
         freq_list.append(df)
@@ -60,10 +81,6 @@ def process_barcharts(file_paths: list[str]) -> tuple[pd.DataFrame, pd.DataFrame
     # compile into DataFrames
     freqs = pd.concat(freq_list)
     samples = pd.DataFrame(sample_size)
-
-    # quasi-taxonomical ordering:
-    # sort by original order in bar chart file
-    freqs = freqs.sort_values(by="Tax_Order")
 
     return freqs, samples
 
@@ -96,4 +113,4 @@ def create_target_pivot(freqs: pd.DataFrame, month: int, week: int) -> pd.DataFr
     # in at least one region (i.e. drop random vagrants)
     pivot = pivot.loc[(pivot > 1).any(axis=1)]
 
-    return pivot
+    return pivot.reset_index()

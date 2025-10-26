@@ -18,4 +18,12 @@ For example, if you will be visiting your target regions in the second week of M
 $ python trip_targets.py /path/to/barcharts/ 5 2
 ```
 
-**NOTE**: Bar chart files should be *unmodified*, since the processing scripts expect the default formatting and file-naming from eBird. 
+**NOTE**: Bar chart files should be *unmodified*, since the processing scripts expect the default formatting and file-naming from eBird.
+
+## Taxonomic sorting with the eBird API 
+
+To enable taxonomic sorting using the latest taxonomy from eBird, set an [eBird API key](https://support.ebird.org/en/support/solutions/articles/48000838205-download-ebird-data#API) as an environment variable: 
+
+```
+export EBIRD_API_KEY="your-api-key-here"
+```
