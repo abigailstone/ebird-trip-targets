@@ -1,29 +1,38 @@
 # eBird Trip Targets
 
-Python tool for generating a spreadsheet of target species across multiple regions. 
+Python tool for generating a spreadsheet of target species across multiple regions, useful for trip planning.
+
+## Setup
+- Install packages from requirements.txt using your favorite package management tool
+- If you want to enable taxonomic sorting using the latest taxonomy from eBird, set an [eBird API key](https://support.ebird.org/en/support/solutions/articles/48000838205-download-ebird-data#API) as an environment variable:
+
+```
+$ export EBIRD_API_KEY="your-api-key-here"
+```
 
 ## Basic usage
 
-Download eBird bar charts for each target region and put them together in a directory. 
+1. Download eBird bar charts for each target region:
 
-Run the script, specifying the path to the directory containing the bar chart files, and the month and year of your trip.
+    a. Navigate to the eBird region page for each region that you'll visit. ([Example](https://ebird.org/region/US-VT-001))
 
-```
-$ python trip_targets.py [path] [month] [week]
-```
+    b. Select "Bar Charts" from the "Explore..." part of the left sidebar.
 
-For example, if you will be visiting your target regions in the second week of May: 
+    c. Scroll all the way to the bottom and click "Download Histogram Data"
 
-```
-$ python trip_targets.py /path/to/barcharts/ 5 2
-```
+    d. Place all your downloaded bar charts in a single directory
 
-**NOTE**: Bar chart files should be *unmodified*, since the processing scripts expect the default formatting and file-naming from eBird.
+    **NOTE**: Bar chart files should be *unmodified*, since the processing scripts expect the default formatting and file-naming from eBird.
 
-## Taxonomic sorting with the eBird API 
 
-To enable taxonomic sorting using the latest taxonomy from eBird, set an [eBird API key](https://support.ebird.org/en/support/solutions/articles/48000838205-download-ebird-data#API) as an environment variable: 
+2. Run the script, specifying the path to the directory containing the bar chart files, and the month and year of your trip.
 
-```
-export EBIRD_API_KEY="your-api-key-here"
-```
+    ```
+    $ python trip_targets.py [path] [month] [week]
+    ```
+
+    For example, if you will be visiting your target regions in the second week of May:
+
+    ```
+    $ python trip_targets.py /path/to/barcharts/ 5 2
+    ```
