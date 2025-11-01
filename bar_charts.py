@@ -7,10 +7,11 @@ import pandas as pd
 import numpy as np
 from ebird.api.requests import get_taxonomy
 
-def join_taxonomy(pivot: pd.DataFrame, api_key: str) -> pd.DataFrame:
+def join_taxonomy(pivot: pd.DataFrame, api_key: str, species_only: bool) -> pd.DataFrame:
     """
     :param pivot: DataFrame of frequencies by region and species
     :param api_key: eBird API key
+    :param species_only: include only species (no hybrid, slash, or spuh) in results
     :return: DataFrame with taxonomy ordering from eBird API
     """
     # fetch taxonomy from eBird API
@@ -23,6 +24,10 @@ def join_taxonomy(pivot: pd.DataFrame, api_key: str) -> pd.DataFrame:
 
     # sort by taxonomic order
     joined = joined.sort_values("taxonOrder")
+
+    # keep only "species" entries
+    if species_only:
+        joined = joined[joined["category"] == "species"]
 
     joined = joined.drop(columns=["category", "taxonOrder"])
 
@@ -40,7 +45,10 @@ def process_barcharts(file_paths: list[str]) -> tuple[pd.DataFrame, pd.DataFrame
     sample_size = {}
 
     # create month and week index
-    mw = pd.DataFrame([(m, w) for m in range(1, 13) for w in range(1, 5)], columns=["month", "week"])
+    mw = pd.DataFrame(
+        [(m, w) for m in range(1, 13) for w in range(1, 5)],
+        columns=["month", "week"]
+    )
     week_vars = [f"{m}_{w}" for m, w in zip(mw["month"], mw["week"])]
 
     # new column names using month and week

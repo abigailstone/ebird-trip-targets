@@ -10,11 +10,13 @@ from glob import glob
 
 from bar_charts import process_barcharts, create_target_pivot, join_taxonomy
 
-def get_trip_targets(data_path: str, month: int, week: int, key: str | None):
+def get_trip_targets(data_path: str, month: int, week: int, key: str | None, species_only: bool):
     """
     :param data_path: path to bar chart .txt files
-    :param month: target month number (int)
-    :param week: target week number (int)
+    :param month: target month number
+    :param week: target week number
+    :param key: eBird API key
+    :param species_only: include only species (no hybrid, slash, or spuh) in results
     """
 
     data_files = glob(f"{data_path}/*.txt")
@@ -27,7 +29,7 @@ def get_trip_targets(data_path: str, month: int, week: int, key: str | None):
 
     # join taxonomy
     if key:
-        result = join_taxonomy(pivot, api_key=key)
+        result = join_taxonomy(pivot, api_key=key, species_only=species_only)
     else:
         result = pivot
 
@@ -59,9 +61,15 @@ if __name__ == "__main__":
         default=True, help="Whether to sort by taxonomy (requires eBird API key)"
     )
 
+    parser.add_argument(
+        "--species-only", type=bool,
+        default=True,
+        help="Whether to filter to species only. If False, results include hybrid, slash, and spuh."
+    )
+
     args = parser.parse_args()
 
     # look for API key
     api_key = os.getenv("EBIRD_API_KEY", None) if args.sort else None
 
-    get_trip_targets(args.data_path, args.month, args.week, api_key)
+    get_trip_targets(args.data_path, args.month, args.week, api_key, args.species_only)
