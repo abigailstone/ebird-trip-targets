@@ -8,7 +8,8 @@ import os
 import argparse
 from glob import glob
 
-from bar_charts import process_barcharts, create_target_pivot, join_taxonomy
+from bar_charts import process_barcharts, create_target_pivot
+from taxonomy import join_taxonomy
 
 def get_trip_targets(data_path: str, month: int, week: int, key: str | None, species_only: bool):
     """
