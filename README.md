@@ -37,11 +37,13 @@ $ export EBIRD_API_KEY="your-api-key-here"
     $ python trip_targets.py /path/to/barcharts/ 5 2
     ```
 
-# Additional features
+## Additional features
 
 The following command line arguments are supported:
 
 - `--sort`: Taxonomic sorting is enabled by default. If you wish to skip taxonomic sorting, use `--sort False`. If sorting is disabled (or if you do not have an API key saved as an environment variable), the results will appear in the order in which they appear in the first bar chart file, with additional species found in subsequent bar charts appended to the end.
 
 - `--species-only`: By default, only the "species" taxonomy category is returned. If you wish to have hybrids, slashes, and spuhs included in the output, set `--species_only` to False. If sorting is disabled or no API key is found, all taxonomy categories will be included in the output.
+
+- `--life-list`: Use this option to provide a path to your life list data. The result will merge your life list with the regional results and add an indicator column `on_life_list` to distinguish species that you have already seen vs. species that could be new additions to your life list. Life list data should be an unmodified .csv downloaded from your eBird account (go to https://ebird.org/lifelist). 
 
